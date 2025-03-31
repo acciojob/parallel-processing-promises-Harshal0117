@@ -1,7 +1,7 @@
 const imageUrls = [
-    "https://example.com/image1.jpg",
-    "https://example.com/image2.jpg",
-    "https://example.com/image3.jpg"
+    "https://via.placeholder.com/150",
+    "https://via.placeholder.com/200",
+    "https://invalid-url.com/image.jpg" // Invalid URL to test error handling
 ];
 
 function downloadImage(url) {
@@ -9,7 +9,7 @@ function downloadImage(url) {
         const img = new Image();
         img.src = url;
         img.onload = () => resolve(img);
-        img.onerror = () => reject(`Failed to load image: ${url}`);
+        img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
     });
 }
 
@@ -23,12 +23,21 @@ async function downloadImages() {
     loadingDiv.style.display = "block";
 
     try {
-        const images = await Promise.all(imageUrls.map(downloadImage));
+        const images = await Promise.allSettled(imageUrls.map(downloadImage));
         loadingDiv.style.display = "none";
-        images.forEach(img => outputDiv.appendChild(img));
+        
+        images.forEach(result => {
+            if (result.status === "fulfilled") {
+                outputDiv.appendChild(result.value);
+            } else {
+                const errorMsg = document.createElement("p");
+                errorMsg.textContent = result.reason.message;
+                errorDiv.appendChild(errorMsg);
+            }
+        });
     } catch (error) {
         loadingDiv.style.display = "none";
-        errorDiv.innerHTML = error;
+        errorDiv.innerHTML = error.message;
     }
 }
 
