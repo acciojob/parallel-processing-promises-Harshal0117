@@ -1,8 +1,7 @@
-//your JS code here. If required.
 const imageUrls = [
-    "https://picsum.photos/id/237/200/300",
-    "https://picsum.photos/id/238/200/300",
-    "https://picsum.photos/id/239/200/300"
+    "https://example.com/image1.jpg",
+    "https://example.com/image2.jpg",
+    "https://example.com/image3.jpg"
 ];
 
 function downloadImage(url) {
@@ -20,18 +19,18 @@ async function downloadImages() {
     const loadingDiv = document.getElementById("loading");
     
     outputDiv.innerHTML = "";
-    errorDiv.innerText = "";
+    errorDiv.innerHTML = "";
     loadingDiv.style.display = "block";
-    
+
     try {
         const images = await Promise.all(imageUrls.map(downloadImage));
         loadingDiv.style.display = "none";
-        
         images.forEach(img => outputDiv.appendChild(img));
     } catch (error) {
         loadingDiv.style.display = "none";
-        errorDiv.innerText = error;
+        errorDiv.innerHTML = error;
     }
 }
 
-downloadImages();
+document.getElementById("btn").addEventListener("click", downloadImages);
+
