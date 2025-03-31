@@ -3,15 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Loader</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Image Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #loading {
+            display: none;
+            font-size: 18px;
+            color: blue;
+        }
+        #error {
+            color: red;
+            margin-top: 10px;
+        }
+        #output img {
+            max-width: 150px;
+            margin: 5px;
+        }
+    </style>
 </head>
 <body>
+    <h1>Image Downloader</h1>
+    <button onclick="downloadImages()">Download Images</button>
     <div id="loading">Loading...</div>
     <div id="error"></div>
     <div id="output"></div>
 
-    <script src="script.js"></script>
+    <script>
+        const imageUrls = [
+            "https://via.placeholder.com/150",
+            "https://via.placeholder.com/200",
+            "https://invalid-url.com/404", // This will cause an error
+            "https://via.placeholder.com/250"
+        ];
+
+        function downloadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = url;
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(`Failed to load image: ${url}`);
+            });
+        }
+
+        function downloadImages() {
+            document.getElementById("output").innerHTML = "";
+            document.getElementById("error").innerText = "";
+            document.getElementById("loading").style.display = "block";
+
+            const imagePromises = imageUrls.map(downloadImage);
+
+            Promise.all(imagePromises)
+                .then(images => {
+                    document.getElementById("loading").style.display = "none";
+                    const outputDiv = document.getElementById("output");
+                    images.forEach(img => outputDiv.appendChild(img));
+                })
+                .catch(error => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("error").innerText = error;
+                });
+        }
+    </script>
 </body>
 </html>
-
